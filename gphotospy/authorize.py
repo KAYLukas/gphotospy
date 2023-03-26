@@ -52,7 +52,7 @@ def init(secrets, port = 8080):
     -------
     A service object to pass to the Media, Album, or SharedAlbum contructors
     """
-    credentials = get_credentials(secrets, 8080)
+    credentials = get_credentials(secrets, port)
     service_object = {
         "secrets": secrets
     }
