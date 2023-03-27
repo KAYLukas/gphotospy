@@ -17,16 +17,13 @@ scopes_arr = [
 
 
 def get_credentials(secrets, port = 8080):
-    if (type(secrets) is dict):
-        credentials = secrets
-    else:
-        credentials = None
-        secrets_dir = os.path.dirname(os.path.abspath(secrets))
-        token_path = os.path.join(secrets_dir, token_file)
+    credentials = None
+    secrets_dir = os.path.dirname(os.path.abspath(secrets))
+    token_path = os.path.join(secrets_dir, token_file)
 
-        if os.path.exists(token_path):
-            with open(token_path, 'rb') as token:
-                credentials = pickle.load(token)
+    if os.path.exists(token_path):
+        with open(token_path, 'rb') as token:
+            credentials = pickle.load(token)
 
     if not credentials or not credentials.valid:
         if credentials and credentials.expired and credentials.refresh_token:
@@ -35,25 +32,20 @@ def get_credentials(secrets, port = 8080):
             app_flow = InstalledAppFlow.from_client_secrets_file(
                 secrets, scopes_arr)
             credentials = app_flow.run_local_server(port = port)
-        
-        if (not type(secrets) is dict):
-            secrets_dir = os.path.dirname(os.path.abspath(secrets))
-            token_path = os.path.join(secrets_dir, token_file)
-            with open(token_path, 'wb') as token:
-                pickle.dump(credentials, token)
+
+        with open(token_path, 'wb') as token:
+            pickle.dump(credentials, token)
     return credentials
 
 
 def init(secrets, port = 8080):
     """
     Initializes the service, requesting the authorization from the browser.
-
     Parameters
     ----------
     secrets: str
         JSON file containing the secrets for OAuth,
         as created in the Google Cloud Console
-
     Returns
     -------
     A service object to pass to the Media, Album, or SharedAlbum contructors
