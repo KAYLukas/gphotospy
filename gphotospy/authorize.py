@@ -17,13 +17,16 @@ scopes_arr = [
 
 
 def get_credentials(secrets, port = 8080):
-    credentials = None
-    secrets_dir = os.path.dirname(os.path.abspath(secrets))
-    token_path = os.path.join(secrets_dir, token_file)
+    if (type(secrets) is dict):
+        credentials = secrets
+    else:
+        credentials = None
+        secrets_dir = os.path.dirname(os.path.abspath(secrets))
+        token_path = os.path.join(secrets_dir, token_file)
 
-    if os.path.exists(token_path):
-        with open(token_path, 'rb') as token:
-            credentials = pickle.load(token)
+        if os.path.exists(token_path):
+            with open(token_path, 'rb') as token:
+                credentials = pickle.load(token)
 
     if not credentials or not credentials.valid:
         if credentials and credentials.expired and credentials.refresh_token:
@@ -32,9 +35,12 @@ def get_credentials(secrets, port = 8080):
             app_flow = InstalledAppFlow.from_client_secrets_file(
                 secrets, scopes_arr)
             credentials = app_flow.run_local_server(port = port)
-
-        with open(token_path, 'wb') as token:
-            pickle.dump(credentials, token)
+        
+        if (not type(secrets) is dict):
+            secrets_dir = os.path.dirname(os.path.abspath(secrets))
+            token_path = os.path.join(secrets_dir, token_file)
+            with open(token_path, 'wb') as token:
+                pickle.dump(credentials, token)
     return credentials
 
 
